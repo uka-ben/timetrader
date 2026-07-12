@@ -252,7 +252,7 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
         st.warning("No data to plot.")
         return None
 
-    fig, axes = plt.subplots(n, 1, figsize=(14, 8 * n), sharex=False)
+    fig, axes = plt.subplots(n, 1, figsize=(16, 10 * n), sharex=False)
     if n == 1:
         axes = [axes]
 
@@ -374,7 +374,7 @@ def main():
     st.sidebar.header("Parameters")
     symbol = st.sidebar.text_input("Symbol (e.g., BTC, ETH, EUR)", value="BTC")
     api_key = st.sidebar.text_input("Twelve Data API Key", value="cef197ce3e054ee69d6c795401b229cd", type="password")
-    lookback = st.sidebar.number_input("Lookback bars", value=710, min_value=100, step=50)
+    lookback = st.sidebar.number_input("Lookback bars", value=200, min_value=100, step=50)
     extrema_order = st.sidebar.number_input("Extrema order", value=50, min_value=10, step=5)
     atr_period = st.sidebar.number_input("ATR period", value=14, min_value=5, step=1)
     sl_window = st.sidebar.number_input("SL window (for swing SL)", value=5, min_value=1, step=1)
