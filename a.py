@@ -253,19 +253,19 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
         return None
 
     # Much larger figure: width 22, height per subplot 18
-    fig, axes = plt.subplots(n, 1, figsize=(22, 18 * n), sharex=False)
+    fig, axes = plt.subplots(n, 1, figsize=(28, 18 * n), sharex=False)
     if n == 1:
         axes = [axes]
 
     # Global font sizes - very large and bold
     plt.rcParams.update({
-        'font.size': 18,
+        'font.size': 24,
         'axes.labelsize': 20,
         'axes.titlesize': 24,
-        'xtick.labelsize': 18,
-        'ytick.labelsize': 18,
-        'legend.fontsize': 18,
-        'legend.title_fontsize': 18,
+        'xtick.labelsize': 24,
+        'ytick.labelsize': 24,
+        'legend.fontsize': 24,
+        'legend.title_fontsize': 24,
         'figure.titlesize': 24
     })
 
@@ -392,9 +392,9 @@ def main():
     st.markdown("<h2 style='text-align: left;'>📈 Swing 3 Strategy – Bias-Adaptive ATR</h2>", unsafe_allow_html=True)
 
     st.sidebar.header("Parameters")
-    symbol = st.sidebar.text_input("Symbol (e.g., BTC, ETH, EUR)", value="BTC")
+    symbol = st.sidebar.text_input("Symbol (e.g., BTC, ETH, EUR)", value="ETH")
     api_key = st.sidebar.text_input("Twelve Data API Key", value="59bc056a63f24482bf681e2f1115e226", type="password")
-    lookback = st.sidebar.number_input("Lookback bars", value=200, min_value=100, step=50)
+    lookback = st.sidebar.number_input("Lookback bars", value=150, min_value=100, step=50)
     extrema_order = st.sidebar.number_input("Extrema order", value=50, min_value=10, step=5)
     atr_period = st.sidebar.number_input("ATR period", value=14, min_value=5, step=1)
     sl_window = st.sidebar.number_input("SL window (for swing SL)", value=5, min_value=1, step=1)
