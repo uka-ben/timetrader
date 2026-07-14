@@ -8,7 +8,7 @@ from scipy.signal import argrelextrema
 import warnings
 warnings.filterwarnings('ignore')
 
-# ---------- Technical Indicators ----------
+# ---------- Technical Indicators (copied from original) ----------
 def compute_macd(data, short=12, long=26, signal=9):
     macd_line = data['Close'].ewm(span=short, adjust=False).mean() - data['Close'].ewm(span=long, adjust=False).mean()
     signal_line = macd_line.ewm(span=signal, adjust=False).mean()
@@ -252,73 +252,76 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
         st.warning("No data to plot.")
         return None
 
-    # Increase height per subplot: using 18 per subplot for larger display
+    # Much larger figure: width 22, height per subplot 18
     fig, axes = plt.subplots(n, 1, figsize=(22, 18 * n), sharex=False)
     if n == 1:
         axes = [axes]
 
-    # Set global font sizes
+    # Global font sizes - very large and bold
     plt.rcParams.update({
-        'font.size': 14,
-        'axes.labelsize': 16,
-        'axes.titlesize': 18,
-        'xtick.labelsize': 14,
-        'ytick.labelsize': 14,
-        'legend.fontsize': 14,
-        'legend.title_fontsize': 14,
-        'figure.titlesize': 20
+        'font.size': 18,
+        'axes.labelsize': 20,
+        'axes.titlesize': 24,
+        'xtick.labelsize': 18,
+        'ytick.labelsize': 18,
+        'legend.fontsize': 18,
+        'legend.title_fontsize': 18,
+        'figure.titlesize': 24
     })
 
     for row, interval in enumerate(intervals):
         df = results_dict[interval]
         if df.empty:
-            axes[row].text(0.5, 0.5, f"No data for {interval}", ha='center', va='center', fontsize=16, weight='bold')
-            axes[row].set_title(f'{symbol}/USD  {interval}', fontsize=18, weight='bold')
+            axes[row].text(0.5, 0.5, f"No data for {interval}", ha='center', va='center', fontsize=20, weight='bold')
+            axes[row].set_title(f'{symbol}/USD  {interval}', fontsize=24, weight='bold')
             continue
 
         ax_div = axes[row]
-        ax_div.set_xlabel('Date', fontweight='bold', fontsize=16, color='black')
-        ax_div.set_ylabel('Divergence Score (inverted: bullish ↓, bearish ↑)', fontweight='bold', fontsize=14, color='black')
+        ax_div.set_xlabel('Date', fontweight='bold', fontsize=20, color='black')
+        ax_div.set_ylabel('Divergence Score (inverted: bullish ↓, bearish ↑)', fontweight='bold', fontsize=18, color='black')
 
         inverted_score = -df['Divergence_Score']
         bar_width = 0.8 * (df.index[1] - df.index[0]).total_seconds() / (24 * 3600)
         colors = ['green' if x > 0 else 'red' if x < 0 else 'gray' for x in df['Divergence_Score']]
         ax_div.bar(df.index, inverted_score, color=colors, width=bar_width, alpha=0.85, zorder=0)
 
-        ax_div.axhline(0, color='black', linewidth=0.5, alpha=0.4)
-        ax_div.axhline(-3, color='green', linestyle='--', alpha=0.6, linewidth=1.0, label='Strong Bull')
-        ax_div.axhline(3, color='red', linestyle='--', alpha=0.6, linewidth=1.0, label='Strong Bear')
-        ax_div.tick_params(axis='y', labelsize=14, colors='black', labelcolor='black')
-        ax_div.tick_params(axis='x', labelsize=14, colors='black', labelcolor='black')
+        ax_div.axhline(0, color='black', linewidth=1, alpha=0.4)
+        ax_div.axhline(-3, color='green', linestyle='--', alpha=0.6, linewidth=2, label='Strong Bull')
+        ax_div.axhline(3, color='red', linestyle='--', alpha=0.6, linewidth=2, label='Strong Bear')
+        ax_div.tick_params(axis='y', labelsize=18, colors='black', labelcolor='black')
+        ax_div.tick_params(axis='x', labelsize=18, colors='black', labelcolor='black')
         ax_div.grid(True, alpha=0.2, axis='x')
 
         for tick in ax_div.get_xticklabels():
-            tick.set_fontweight('semibold')
+            tick.set_fontweight('bold')
             tick.set_color('black')
         for tick in ax_div.get_yticklabels():
-            tick.set_fontweight('semibold')
+            tick.set_fontweight('bold')
             tick.set_color('black')
 
         max_score = max(abs(df['Divergence_Score'].max()), abs(df['Divergence_Score'].min()), 1)
         ax_div.set_ylim(-max_score * 1.2, max_score * 1.2)
 
         ax_price = ax_div.twinx()
-        ax_price.plot(df.index, df['Close'], 'k-', label='Close', linewidth=1.2, alpha=0.9, zorder=1)
-        ax_price.set_ylabel('Price', fontweight='bold', fontsize=14, color='blue')
-        ax_price.tick_params(axis='y', labelsize=14, colors='black', labelcolor='black')
+        # Thicker price line
+        ax_price.plot(df.index, df['Close'], 'k-', label='Close', linewidth=3, alpha=0.9, zorder=1)
+        ax_price.set_ylabel('Price', fontweight='bold', fontsize=18, color='blue')
+        ax_price.tick_params(axis='y', labelsize=18, colors='black', labelcolor='black')
         for tick in ax_price.get_yticklabels():
-            tick.set_fontweight('semibold')
+            tick.set_fontweight('bold')
             tick.set_color('black')
 
         current_price = df['Close'].iloc[-1]
-        ax_price.axhline(y=current_price, color='black', linestyle='-', linewidth=3.0, alpha=0.8, zorder=2)
-        ax_price.axhline(y=current_price, color='red', linestyle='--', linewidth=1.8, alpha=1.0, label='Current Price', zorder=3)
-        ax_price.text(1.02, current_price, f'{current_price:.4f}', color='red', fontsize=14, fontweight='bold',
+        # Thicker current price lines
+        ax_price.axhline(y=current_price, color='black', linestyle='-', linewidth=5, alpha=0.8, zorder=2)
+        ax_price.axhline(y=current_price, color='red', linestyle='--', linewidth=4, alpha=1.0, label='Current Price', zorder=3)
+        # Bigger current price text
+        ax_price.text(1.02, current_price, f'{current_price:.4f}', color='red', fontsize=20, fontweight='bold',
                       va='center', ha='left', transform=ax_price.get_yaxis_transform(), zorder=10,
-                      bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='black', alpha=0.9))
+                      bbox=dict(boxstyle='round,pad=0.3', facecolor='white', edgecolor='black', alpha=0.9))
 
         price_range = df['Close'].max() - df['Close'].min()
-        label_offset = price_range * 0.005
+        label_offset = price_range * 0.01  # more offset to avoid overlap
 
         signals = df[df['Confirmed_Divergence'] != 0]
         for idx in signals.index:
@@ -332,50 +335,52 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
 
             marker = '^' if sig == 1 else 'v'
             color = 'green' if sig == 1 else 'red'
-            ax_price.scatter(idx, entry, color=color, marker=marker, s=150, zorder=15,
+            # Larger markers
+            ax_price.scatter(idx, entry, color=color, marker=marker, s=250, zorder=15,
                              alpha=0.8,
                              label='Bullish' if (sig == 1 and row == 0) else 'Bearish' if (sig == -1 and row == 0) else "",
-                             edgecolors='black', linewidth=0.5)
+                             edgecolors='black', linewidth=1.5)
 
             start_pos = max(0, pos - sl_tp_display_window)
             end_pos = min(len(df)-1, pos + sl_tp_display_window)
             start_date = df.index[start_pos]
             end_date = df.index[end_pos]
 
+            # Thicker SL/TP lines
             if not np.isnan(sl):
-                ax_price.plot([start_date, end_date], [sl, sl], color='darkred', linestyle='--', linewidth=1.0, alpha=0.9, zorder=2)
-                ax_price.text(end_date, sl + label_offset, f'SL {sl:.4f}', color='darkred', fontsize=12, fontweight='bold',
+                ax_price.plot([start_date, end_date], [sl, sl], color='darkred', linestyle='--', linewidth=3, alpha=0.9, zorder=2)
+                ax_price.text(end_date, sl + label_offset, f'SL {sl:.4f}', color='darkred', fontsize=16, fontweight='bold',
                               va='bottom', ha='left', zorder=10,
-                              bbox=dict(boxstyle='round,pad=0.1', facecolor='white', edgecolor='darkred', alpha=0.3))
+                              bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='darkred', alpha=0.5))
             if not np.isnan(tp1):
-                ax_price.plot([start_date, end_date], [tp1, tp1], color='darkblue', linestyle='--', linewidth=1.2, alpha=0.9, zorder=2)
-                ax_price.text(end_date, tp1 + label_offset, f'TP1 {tp1:.4f}', color='darkblue', fontsize=12, fontweight='bold',
+                ax_price.plot([start_date, end_date], [tp1, tp1], color='darkblue', linestyle='--', linewidth=3, alpha=0.9, zorder=2)
+                ax_price.text(end_date, tp1 + label_offset, f'TP1 {tp1:.4f}', color='darkblue', fontsize=16, fontweight='bold',
                               va='bottom', ha='left', zorder=10,
-                              bbox=dict(boxstyle='round,pad=0.1', facecolor='white', edgecolor='darkblue', alpha=0.3))
+                              bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='darkblue', alpha=0.5))
             if not np.isnan(tp2):
-                ax_price.plot([start_date, end_date], [tp2, tp2], color='darkblue', linestyle='--', linewidth=1.2, alpha=0.7, zorder=2)
-                ax_price.text(end_date, tp2 + label_offset, f'TP2 {tp2:.4f}', color='darkblue', fontsize=12, fontweight='bold',
+                ax_price.plot([start_date, end_date], [tp2, tp2], color='darkblue', linestyle='--', linewidth=3, alpha=0.7, zorder=2)
+                ax_price.text(end_date, tp2 + label_offset, f'TP2 {tp2:.4f}', color='darkblue', fontsize=16, fontweight='bold',
                               va='bottom', ha='left', zorder=10,
-                              bbox=dict(boxstyle='round,pad=0.1', facecolor='white', edgecolor='darkblue', alpha=0.3))
+                              bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='darkblue', alpha=0.5))
             if not np.isnan(tp3):
-                ax_price.plot([start_date, end_date], [tp3, tp3], color='darkblue', linestyle='--', linewidth=1.2, alpha=0.7, zorder=2)
-                ax_price.text(end_date, tp3 + label_offset, f'TP3 {tp3:.4f}', color='darkblue', fontsize=12, fontweight='bold',
+                ax_price.plot([start_date, end_date], [tp3, tp3], color='darkblue', linestyle='--', linewidth=3, alpha=0.7, zorder=2)
+                ax_price.text(end_date, tp3 + label_offset, f'TP3 {tp3:.4f}', color='darkblue', fontsize=16, fontweight='bold',
                               va='bottom', ha='left', zorder=10,
-                              bbox=dict(boxstyle='round,pad=0.1', facecolor='white', edgecolor='darkblue', alpha=0.3))
+                              bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='darkblue', alpha=0.5))
 
-        ax_price.set_title(f'{symbol}/USD  {interval}', fontsize=20, fontweight='bold', pad=10)
+        ax_price.set_title(f'{symbol}/USD  {interval}', fontsize=24, fontweight='bold', pad=15)
         lines1, labels1 = ax_price.get_legend_handles_labels()
         lines2, labels2 = ax_div.get_legend_handles_labels()
         unique = dict(zip(labels1 + labels2, lines1 + lines2))
         if unique:
-            leg = ax_price.legend(unique.values(), unique.keys(), loc='upper left', fontsize=14)
+            leg = ax_price.legend(unique.values(), unique.keys(), loc='upper left', fontsize=18)
             for text in leg.get_texts():
                 text.set_fontweight('bold')
                 text.set_color('black')
             leg.get_frame().set_facecolor('white')
             leg.get_frame().set_edgecolor('black')
 
-        ax_div.tick_params(axis='x', rotation=30, labelsize=14)
+        ax_div.tick_params(axis='x', rotation=30, labelsize=18)
 
     plt.tight_layout()
     return fig
@@ -383,7 +388,7 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
 # ---------- Streamlit App ----------
 def main():
     st.set_page_config(page_title="Trading Strategy v5d", layout="wide")
-    # Reduced title size
+    # Smaller page title
     st.markdown("<h2 style='text-align: left;'>📈 Swing 3 Strategy – Bias-Adaptive ATR</h2>", unsafe_allow_html=True)
 
     st.sidebar.header("Parameters")
@@ -402,60 +407,80 @@ def main():
     )
     sl_tp_display_window = st.sidebar.number_input("SL/TP display window (bars around signal)", value=20, min_value=5, step=5)
 
-    # Auto-run analysis without button
-    if not api_key:
-        st.error("Please provide your Twelve Data API key.")
-        return
+    # Button to manually refresh
+    run_button = st.sidebar.button("Run Analysis")
 
-    results = {}
-    progress_bar = st.progress(0)
-    status_text = st.empty()
+    # Initialize session state for results
+    if "results" not in st.session_state:
+        st.session_state.results = None
+    if "auto_run_done" not in st.session_state:
+        st.session_state.auto_run_done = False
 
-    for i, interval in enumerate(intervals):
-        status_text.text(f"Loading {interval}...")
-        df = load_market_data(symbol, interval, lookback, api_key)
-        if df.empty:
-            results[interval] = pd.DataFrame()
-            continue
-        df_signals = swing_3_strategy(df, extrema_order=extrema_order)
-        if df_signals.empty:
-            results[interval] = pd.DataFrame()
-            continue
-        df_signals = compute_sl_tp(df_signals, atr_period=atr_period, sl_window=sl_window,
-                                   stop_loss_type=stop_loss_type, atr_stop_multiplier=atr_stop_multiplier)
-        results[interval] = df_signals
-        progress_bar.progress((i + 1) / len(intervals))
+    # Auto-run on first load or when button is pressed
+    if run_button or (not st.session_state.auto_run_done):
+        if not api_key:
+            st.error("Please provide your Twelve Data API key.")
+            return
 
-    status_text.text("Plotting...")
-    fig = plot_multi_timeframe(results, symbol, sl_tp_display_window=sl_tp_display_window)
-    if fig is not None:
-        st.pyplot(fig)
+        results = {}
+        progress_bar = st.progress(0)
+        status_text = st.empty()
+
+        for i, interval in enumerate(intervals):
+            status_text.text(f"Loading {interval}...")
+            df = load_market_data(symbol, interval, lookback, api_key)
+            if df.empty:
+                results[interval] = pd.DataFrame()
+                continue
+            df_signals = swing_3_strategy(df, extrema_order=extrema_order)
+            if df_signals.empty:
+                results[interval] = pd.DataFrame()
+                continue
+            df_signals = compute_sl_tp(df_signals, atr_period=atr_period, sl_window=sl_window,
+                                       stop_loss_type=stop_loss_type, atr_stop_multiplier=atr_stop_multiplier)
+            results[interval] = df_signals
+            progress_bar.progress((i + 1) / len(intervals))
+
+        status_text.text("Plotting...")
+        st.session_state.results = results
+        st.session_state.auto_run_done = True
+        # Clear progress after completion
+        progress_bar.empty()
+        status_text.empty()
+
+    # Display results if available
+    if st.session_state.results is not None:
+        fig = plot_multi_timeframe(st.session_state.results, symbol, sl_tp_display_window=sl_tp_display_window)
+        if fig is not None:
+            st.pyplot(fig)
+        else:
+            st.warning("No data to display.")
+
+        # Show signal summary
+        st.subheader("Signal Summary")
+        all_signals = []
+        for interval, df in st.session_state.results.items():
+            if df.empty:
+                continue
+            sigs = df[df['Confirmed_Divergence'] != 0][['Date', 'Close', 'Confirmed_Divergence', 'SL_Level', 'TP1', 'TP2', 'TP3']]
+            if not sigs.empty:
+                sigs['Timeframe'] = interval
+                all_signals.append(sigs)
+        if all_signals:
+            summary = pd.concat(all_signals).sort_index()
+            summary = summary.rename(columns={
+                'Confirmed_Divergence': 'Signal (1=Bull, -1=Bear)',
+                'Close': 'Entry Price',
+                'SL_Level': 'Stop Loss',
+                'TP1': 'TP1',
+                'TP2': 'TP2',
+                'TP3': 'TP3'
+            })
+            st.dataframe(summary)
+        else:
+            st.info("No signals generated.")
     else:
-        st.warning("No data to display.")
-
-    # Show signal summary
-    st.subheader("Signal Summary")
-    all_signals = []
-    for interval, df in results.items():
-        if df.empty:
-            continue
-        sigs = df[df['Confirmed_Divergence'] != 0][['Date', 'Close', 'Confirmed_Divergence', 'SL_Level', 'TP1', 'TP2', 'TP3']]
-        if not sigs.empty:
-            sigs['Timeframe'] = interval
-            all_signals.append(sigs)
-    if all_signals:
-        summary = pd.concat(all_signals).sort_index()
-        summary = summary.rename(columns={
-            'Confirmed_Divergence': 'Signal (1=Bull, -1=Bear)',
-            'Close': 'Entry Price',
-            'SL_Level': 'Stop Loss',
-            'TP1': 'TP1',
-            'TP2': 'TP2',
-            'TP3': 'TP3'
-        })
-        st.dataframe(summary)
-    else:
-        st.info("No signals generated.")
+        st.info("Click 'Run Analysis' to load data and generate signals.")
 
 if __name__ == "__main__":
     main()
