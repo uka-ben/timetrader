@@ -252,20 +252,33 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
         st.warning("No data to plot.")
         return None
 
-    fig, axes = plt.subplots(n, 1, figsize=(16, 10 * n), sharex=False)
+    # Increase figure size: larger width and height per subplot
+    fig, axes = plt.subplots(n, 1, figsize=(20, 12 * n), sharex=False)
     if n == 1:
         axes = [axes]
+
+    # Set global font sizes for the plot
+    plt.rcParams.update({
+        'font.size': 14,          # base font size
+        'axes.labelsize': 16,     # axis labels
+        'axes.titlesize': 18,     # subplot titles
+        'xtick.labelsize': 14,
+        'ytick.labelsize': 14,
+        'legend.fontsize': 14,
+        'legend.title_fontsize': 14,
+        'figure.titlesize': 20
+    })
 
     for row, interval in enumerate(intervals):
         df = results_dict[interval]
         if df.empty:
-            axes[row].text(0.5, 0.5, f"No data for {interval}", ha='center', va='center')
-            axes[row].set_title(f'{symbol}/USD  {interval}')
+            axes[row].text(0.5, 0.5, f"No data for {interval}", ha='center', va='center', fontsize=16, weight='bold')
+            axes[row].set_title(f'{symbol}/USD  {interval}', fontsize=18, weight='bold')
             continue
 
         ax_div = axes[row]
-        ax_div.set_xlabel('Date', fontweight='bold', fontsize=10, color='black')
-        ax_div.set_ylabel('Divergence Score (inverted: bullish ↓, bearish ↑)', fontweight='bold', fontsize=9, color='black')
+        ax_div.set_xlabel('Date', fontweight='bold', fontsize=16, color='black')
+        ax_div.set_ylabel('Divergence Score (inverted: bullish ↓, bearish ↑)', fontweight='bold', fontsize=14, color='black')
 
         inverted_score = -df['Divergence_Score']
         bar_width = 0.8 * (df.index[1] - df.index[0]).total_seconds() / (24 * 3600)
@@ -275,7 +288,8 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
         ax_div.axhline(0, color='black', linewidth=0.5, alpha=0.4)
         ax_div.axhline(-3, color='green', linestyle='--', alpha=0.6, linewidth=1.0, label='Strong Bull')
         ax_div.axhline(3, color='red', linestyle='--', alpha=0.6, linewidth=1.0, label='Strong Bear')
-        ax_div.tick_params(axis='y', labelsize=8, colors='black', labelcolor='black')
+        ax_div.tick_params(axis='y', labelsize=14, colors='black', labelcolor='black')
+        ax_div.tick_params(axis='x', labelsize=14, colors='black', labelcolor='black')
         ax_div.grid(True, alpha=0.2, axis='x')
 
         for tick in ax_div.get_xticklabels():
@@ -290,8 +304,8 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
 
         ax_price = ax_div.twinx()
         ax_price.plot(df.index, df['Close'], 'k-', label='Close', linewidth=1.2, alpha=0.9, zorder=1)
-        ax_price.set_ylabel('Price', fontweight='bold', fontsize=9, color='blue')
-        ax_price.tick_params(axis='y', labelsize=8, colors='black', labelcolor='black')
+        ax_price.set_ylabel('Price', fontweight='bold', fontsize=14, color='blue')
+        ax_price.tick_params(axis='y', labelsize=14, colors='black', labelcolor='black')
         for tick in ax_price.get_yticklabels():
             tick.set_fontweight('semibold')
             tick.set_color('black')
@@ -299,7 +313,7 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
         current_price = df['Close'].iloc[-1]
         ax_price.axhline(y=current_price, color='black', linestyle='-', linewidth=3.0, alpha=0.8, zorder=2)
         ax_price.axhline(y=current_price, color='red', linestyle='--', linewidth=1.8, alpha=1.0, label='Current Price', zorder=3)
-        ax_price.text(1.02, current_price, f'{current_price:.4f}', color='red', fontsize=9, fontweight='bold',
+        ax_price.text(1.02, current_price, f'{current_price:.4f}', color='red', fontsize=14, fontweight='bold',
                       va='center', ha='left', transform=ax_price.get_yaxis_transform(), zorder=10,
                       bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='black', alpha=0.9))
 
@@ -318,7 +332,7 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
 
             marker = '^' if sig == 1 else 'v'
             color = 'green' if sig == 1 else 'red'
-            ax_price.scatter(idx, entry, color=color, marker=marker, s=120, zorder=15,
+            ax_price.scatter(idx, entry, color=color, marker=marker, s=150, zorder=15,
                              alpha=0.8,
                              label='Bullish' if (sig == 1 and row == 0) else 'Bearish' if (sig == -1 and row == 0) else "",
                              edgecolors='black', linewidth=0.5)
@@ -330,38 +344,38 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
 
             if not np.isnan(sl):
                 ax_price.plot([start_date, end_date], [sl, sl], color='darkred', linestyle='--', linewidth=1.0, alpha=0.9, zorder=2)
-                ax_price.text(end_date, sl + label_offset, f'SL {sl:.4f}', color='darkred', fontsize=7, fontweight='bold',
+                ax_price.text(end_date, sl + label_offset, f'SL {sl:.4f}', color='darkred', fontsize=12, fontweight='bold',
                               va='bottom', ha='left', zorder=10,
                               bbox=dict(boxstyle='round,pad=0.1', facecolor='white', edgecolor='darkred', alpha=0.3))
             if not np.isnan(tp1):
                 ax_price.plot([start_date, end_date], [tp1, tp1], color='darkblue', linestyle='--', linewidth=1.2, alpha=0.9, zorder=2)
-                ax_price.text(end_date, tp1 + label_offset, f'TP1 {tp1:.4f}', color='darkblue', fontsize=7, fontweight='bold',
+                ax_price.text(end_date, tp1 + label_offset, f'TP1 {tp1:.4f}', color='darkblue', fontsize=12, fontweight='bold',
                               va='bottom', ha='left', zorder=10,
                               bbox=dict(boxstyle='round,pad=0.1', facecolor='white', edgecolor='darkblue', alpha=0.3))
             if not np.isnan(tp2):
                 ax_price.plot([start_date, end_date], [tp2, tp2], color='darkblue', linestyle='--', linewidth=1.2, alpha=0.7, zorder=2)
-                ax_price.text(end_date, tp2 + label_offset, f'TP2 {tp2:.4f}', color='darkblue', fontsize=7, fontweight='bold',
+                ax_price.text(end_date, tp2 + label_offset, f'TP2 {tp2:.4f}', color='darkblue', fontsize=12, fontweight='bold',
                               va='bottom', ha='left', zorder=10,
                               bbox=dict(boxstyle='round,pad=0.1', facecolor='white', edgecolor='darkblue', alpha=0.3))
             if not np.isnan(tp3):
                 ax_price.plot([start_date, end_date], [tp3, tp3], color='darkblue', linestyle='--', linewidth=1.2, alpha=0.7, zorder=2)
-                ax_price.text(end_date, tp3 + label_offset, f'TP3 {tp3:.4f}', color='darkblue', fontsize=7, fontweight='bold',
+                ax_price.text(end_date, tp3 + label_offset, f'TP3 {tp3:.4f}', color='darkblue', fontsize=12, fontweight='bold',
                               va='bottom', ha='left', zorder=10,
                               bbox=dict(boxstyle='round,pad=0.1', facecolor='white', edgecolor='darkblue', alpha=0.3))
 
-        ax_price.set_title(f'{symbol}/USD  {interval}', fontsize=12, fontweight='bold', pad=10)
+        ax_price.set_title(f'{symbol}/USD  {interval}', fontsize=20, fontweight='bold', pad=10)
         lines1, labels1 = ax_price.get_legend_handles_labels()
         lines2, labels2 = ax_div.get_legend_handles_labels()
         unique = dict(zip(labels1 + labels2, lines1 + lines2))
         if unique:
-            leg = ax_price.legend(unique.values(), unique.keys(), loc='upper left', fontsize=8)
+            leg = ax_price.legend(unique.values(), unique.keys(), loc='upper left', fontsize=14)
             for text in leg.get_texts():
                 text.set_fontweight('bold')
                 text.set_color('black')
             leg.get_frame().set_facecolor('white')
             leg.get_frame().set_edgecolor('black')
 
-        ax_div.tick_params(axis='x', rotation=30, labelsize=8)
+        ax_div.tick_params(axis='x', rotation=30, labelsize=14)
 
     plt.tight_layout()
     return fig
@@ -369,62 +383,8 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
 # ---------- Streamlit App ----------
 def main():
     st.set_page_config(page_title="Trading Strategy v5d", layout="wide")
-
-    # ===== MOBILE IMPROVEMENTS =====
-    # Custom CSS: larger, bolder fonts on mobile; shrink the title
-    st.markdown("""
-    <style>
-        /* Make everything bold by default */
-        body, .stApp, .stMarkdown, .stDataFrame, .stTable, .stText,
-        .stSidebar, .stSelectbox, .stNumberInput, .stTextInput, .stButton,
-        .stAlert, .stInfo, .stWarning, .stSuccess, .stException {
-            font-weight: bold !important;
-        }
-        /* On small screens (mobile), increase font sizes */
-        @media (max-width: 768px) {
-            body, .stApp, .stMarkdown, .stText, .stSidebar,
-            .stSelectbox, .stNumberInput, .stTextInput, .stButton {
-                font-size: 18px !important;
-            }
-            /* Sidebar items slightly smaller but still readable */
-            .stSidebar .stMarkdown, .stSidebar .stText, .stSidebar label {
-                font-size: 16px !important;
-            }
-            /* DataFrames need a bit smaller to fit */
-            .stDataFrame, .stTable {
-                font-size: 14px !important;
-            }
-            /* Reduce heading sizes */
-            h1, h2, h3, h4, h5, h6 {
-                font-size: 1.5em !important;
-                font-weight: bold !important;
-            }
-            /* Custom class for the main title */
-            .main-title {
-                font-size: 1.8em !important;
-            }
-        }
-        /* For all screens, make the title smaller than default */
-        .main-title {
-            font-size: 2.2em;
-            font-weight: bold;
-        }
-        /* Add a bit of spacing for the greeting */
-        .greeting {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-    </style>
-    """, unsafe_allow_html=True)
-
-    # ===== GREETING =====
-    # Simple "Good morning" (you can make it time‑aware if you like)
-    st.markdown('<div class="greeting">🌅 Good morning! Welcome to the Swing 3 Strategy.</div>', unsafe_allow_html=True)
-
-    # ===== TITLE (now smaller) =====
-    st.markdown('<h1 class="main-title">📈 Swing 3 Strategy – Bias-Adaptive ATR</h1>', unsafe_allow_html=True)
+    # Reduce title size by using markdown with smaller heading
+    st.markdown("<h2 style='text-align: left;'>📈 Swing 3 Strategy – Bias-Adaptive ATR</h2>", unsafe_allow_html=True)
 
     st.sidebar.header("Parameters")
     symbol = st.sidebar.text_input("Symbol (e.g., BTC, ETH, EUR)", value="BTC")
