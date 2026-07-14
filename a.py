@@ -369,7 +369,62 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
 # ---------- Streamlit App ----------
 def main():
     st.set_page_config(page_title="Trading Strategy v5d", layout="wide")
-    st.title("📈 Swing 3 Strategy – Bias-Adaptive ATR")
+
+    # ===== MOBILE IMPROVEMENTS =====
+    # Custom CSS: larger, bolder fonts on mobile; shrink the title
+    st.markdown("""
+    <style>
+        /* Make everything bold by default */
+        body, .stApp, .stMarkdown, .stDataFrame, .stTable, .stText,
+        .stSidebar, .stSelectbox, .stNumberInput, .stTextInput, .stButton,
+        .stAlert, .stInfo, .stWarning, .stSuccess, .stException {
+            font-weight: bold !important;
+        }
+        /* On small screens (mobile), increase font sizes */
+        @media (max-width: 768px) {
+            body, .stApp, .stMarkdown, .stText, .stSidebar,
+            .stSelectbox, .stNumberInput, .stTextInput, .stButton {
+                font-size: 18px !important;
+            }
+            /* Sidebar items slightly smaller but still readable */
+            .stSidebar .stMarkdown, .stSidebar .stText, .stSidebar label {
+                font-size: 16px !important;
+            }
+            /* DataFrames need a bit smaller to fit */
+            .stDataFrame, .stTable {
+                font-size: 14px !important;
+            }
+            /* Reduce heading sizes */
+            h1, h2, h3, h4, h5, h6 {
+                font-size: 1.5em !important;
+                font-weight: bold !important;
+            }
+            /* Custom class for the main title */
+            .main-title {
+                font-size: 1.8em !important;
+            }
+        }
+        /* For all screens, make the title smaller than default */
+        .main-title {
+            font-size: 2.2em;
+            font-weight: bold;
+        }
+        /* Add a bit of spacing for the greeting */
+        .greeting {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # ===== GREETING =====
+    # Simple "Good morning" (you can make it time‑aware if you like)
+    st.markdown('<div class="greeting">🌅 Good morning! Welcome to the Swing 3 Strategy.</div>', unsafe_allow_html=True)
+
+    # ===== TITLE (now smaller) =====
+    st.markdown('<h1 class="main-title">📈 Swing 3 Strategy – Bias-Adaptive ATR</h1>', unsafe_allow_html=True)
 
     st.sidebar.header("Parameters")
     symbol = st.sidebar.text_input("Symbol (e.g., BTC, ETH, EUR)", value="BTC")
