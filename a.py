@@ -8,7 +8,7 @@ from scipy.signal import argrelextrema
 import warnings
 warnings.filterwarnings('ignore')
 
-# ---------- Technical Indicators (copied from original) ----------
+# ---------- Technical Indicators ----------
 def compute_macd(data, short=12, long=26, signal=9):
     macd_line = data['Close'].ewm(span=short, adjust=False).mean() - data['Close'].ewm(span=long, adjust=False).mean()
     signal_line = macd_line.ewm(span=signal, adjust=False).mean()
@@ -252,16 +252,16 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
         st.warning("No data to plot.")
         return None
 
-    # Increase figure size: larger width and height per subplot
-    fig, axes = plt.subplots(n, 1, figsize=(20, 12 * n), sharex=False)
+    # Increase height per subplot: using 18 per subplot for larger display
+    fig, axes = plt.subplots(n, 1, figsize=(22, 18 * n), sharex=False)
     if n == 1:
         axes = [axes]
 
-    # Set global font sizes for the plot
+    # Set global font sizes
     plt.rcParams.update({
-        'font.size': 14,          # base font size
-        'axes.labelsize': 16,     # axis labels
-        'axes.titlesize': 18,     # subplot titles
+        'font.size': 14,
+        'axes.labelsize': 16,
+        'axes.titlesize': 18,
         'xtick.labelsize': 14,
         'ytick.labelsize': 14,
         'legend.fontsize': 14,
@@ -383,7 +383,7 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
 # ---------- Streamlit App ----------
 def main():
     st.set_page_config(page_title="Trading Strategy v5d", layout="wide")
-    # Reduce title size by using markdown with smaller heading
+    # Reduced title size
     st.markdown("<h2 style='text-align: left;'>📈 Swing 3 Strategy – Bias-Adaptive ATR</h2>", unsafe_allow_html=True)
 
     st.sidebar.header("Parameters")
@@ -402,60 +402,60 @@ def main():
     )
     sl_tp_display_window = st.sidebar.number_input("SL/TP display window (bars around signal)", value=20, min_value=5, step=5)
 
-    if st.sidebar.button("Run Analysis"):
-        if not api_key:
-            st.error("Please provide your Twelve Data API key.")
-            return
+    # Auto-run analysis without button
+    if not api_key:
+        st.error("Please provide your Twelve Data API key.")
+        return
 
-        results = {}
-        progress_bar = st.progress(0)
-        status_text = st.empty()
+    results = {}
+    progress_bar = st.progress(0)
+    status_text = st.empty()
 
-        for i, interval in enumerate(intervals):
-            status_text.text(f"Loading {interval}...")
-            df = load_market_data(symbol, interval, lookback, api_key)
-            if df.empty:
-                results[interval] = pd.DataFrame()
-                continue
-            df_signals = swing_3_strategy(df, extrema_order=extrema_order)
-            if df_signals.empty:
-                results[interval] = pd.DataFrame()
-                continue
-            df_signals = compute_sl_tp(df_signals, atr_period=atr_period, sl_window=sl_window,
-                                       stop_loss_type=stop_loss_type, atr_stop_multiplier=atr_stop_multiplier)
-            results[interval] = df_signals
-            progress_bar.progress((i + 1) / len(intervals))
+    for i, interval in enumerate(intervals):
+        status_text.text(f"Loading {interval}...")
+        df = load_market_data(symbol, interval, lookback, api_key)
+        if df.empty:
+            results[interval] = pd.DataFrame()
+            continue
+        df_signals = swing_3_strategy(df, extrema_order=extrema_order)
+        if df_signals.empty:
+            results[interval] = pd.DataFrame()
+            continue
+        df_signals = compute_sl_tp(df_signals, atr_period=atr_period, sl_window=sl_window,
+                                   stop_loss_type=stop_loss_type, atr_stop_multiplier=atr_stop_multiplier)
+        results[interval] = df_signals
+        progress_bar.progress((i + 1) / len(intervals))
 
-        status_text.text("Plotting...")
-        fig = plot_multi_timeframe(results, symbol, sl_tp_display_window=sl_tp_display_window)
-        if fig is not None:
-            st.pyplot(fig)
-        else:
-            st.warning("No data to display.")
+    status_text.text("Plotting...")
+    fig = plot_multi_timeframe(results, symbol, sl_tp_display_window=sl_tp_display_window)
+    if fig is not None:
+        st.pyplot(fig)
+    else:
+        st.warning("No data to display.")
 
-        # Show signal summary
-        st.subheader("Signal Summary")
-        all_signals = []
-        for interval, df in results.items():
-            if df.empty:
-                continue
-            sigs = df[df['Confirmed_Divergence'] != 0][['Date', 'Close', 'Confirmed_Divergence', 'SL_Level', 'TP1', 'TP2', 'TP3']]
-            if not sigs.empty:
-                sigs['Timeframe'] = interval
-                all_signals.append(sigs)
-        if all_signals:
-            summary = pd.concat(all_signals).sort_index()
-            summary = summary.rename(columns={
-                'Confirmed_Divergence': 'Signal (1=Bull, -1=Bear)',
-                'Close': 'Entry Price',
-                'SL_Level': 'Stop Loss',
-                'TP1': 'TP1',
-                'TP2': 'TP2',
-                'TP3': 'TP3'
-            })
-            st.dataframe(summary)
-        else:
-            st.info("No signals generated.")
+    # Show signal summary
+    st.subheader("Signal Summary")
+    all_signals = []
+    for interval, df in results.items():
+        if df.empty:
+            continue
+        sigs = df[df['Confirmed_Divergence'] != 0][['Date', 'Close', 'Confirmed_Divergence', 'SL_Level', 'TP1', 'TP2', 'TP3']]
+        if not sigs.empty:
+            sigs['Timeframe'] = interval
+            all_signals.append(sigs)
+    if all_signals:
+        summary = pd.concat(all_signals).sort_index()
+        summary = summary.rename(columns={
+            'Confirmed_Divergence': 'Signal (1=Bull, -1=Bear)',
+            'Close': 'Entry Price',
+            'SL_Level': 'Stop Loss',
+            'TP1': 'TP1',
+            'TP2': 'TP2',
+            'TP3': 'TP3'
+        })
+        st.dataframe(summary)
+    else:
+        st.info("No signals generated.")
 
 if __name__ == "__main__":
     main()
