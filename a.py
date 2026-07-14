@@ -373,7 +373,7 @@ def main():
 
     st.sidebar.header("Parameters")
     symbol = st.sidebar.text_input("Symbol (e.g., BTC, ETH, EUR)", value="BTC")
-    api_key = st.sidebar.text_input("Twelve Data API Key", value="cef197ce3e054ee69d6c795401b229cd", type="password")
+    api_key = st.sidebar.text_input("Twelve Data API Key", value="59bc056a63f24482bf681e2f1115e226", type="password")
     lookback = st.sidebar.number_input("Lookback bars", value=200, min_value=100, step=50)
     extrema_order = st.sidebar.number_input("Extrema order", value=50, min_value=10, step=5)
     atr_period = st.sidebar.number_input("ATR period", value=14, min_value=5, step=1)
