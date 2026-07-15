@@ -253,7 +253,7 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
         return None
 
     # Much larger figure: width 22, height per subplot 18
-    fig, axes = plt.subplots(n, 1, figsize=(14, 26 * n), sharex=False)
+    fig, axes = plt.subplots(n, 1, figsize=(18, 26 * n), sharex=False)
     if n == 1:
         axes = [axes]
 
