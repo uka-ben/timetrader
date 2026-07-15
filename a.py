@@ -259,12 +259,12 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
     plt.rcParams.update({
         'font.size': 24,
         'axes.labelsize': 20,
-        'axes.titlesize': 24,
-        'xtick.labelsize': 28,
-        'ytick.labelsize': 28,
-        'legend.fontsize': 24,
-        'legend.title_fontsize': 24,
-        'figure.titlesize': 24
+        'axes.titlesize': 30,
+        'xtick.labelsize': 32,
+        'ytick.labelsize': 32,
+        'legend.fontsize': 30,
+        'legend.title_fontsize': 30,
+        'figure.titlesize': 30
     })
 
     for row, interval in enumerate(intervals):
@@ -332,7 +332,7 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
             marker = '^' if sig == 1 else 'v'
             color = 'green' if sig == 1 else 'red'
             # Marker size tripled (250 -> 750)
-            ax_price.scatter(idx, entry, color=color, marker=marker, s=750, zorder=15,
+            ax_price.scatter(idx, entry, color=color, marker=marker, s=850, zorder=15,
                              alpha=0.8,
                              label='Bullish' if (sig == 1 and row == 0) else 'Bearish' if (sig == -1 and row == 0) else "",
                              edgecolors='black', linewidth=1.5)
@@ -344,25 +344,25 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
 
             if not np.isnan(sl):
                 ax_price.plot([start_date, end_date], [sl, sl], color='darkred', linestyle='--', linewidth=3, alpha=0.9, zorder=2)
-                # SL font size = 24
+                # SL font size = 30
                 ax_price.text(end_date, sl + label_offset, f'SL {sl:.4f}', color='darkred', fontsize=24, fontweight='bold',
                               va='bottom', ha='left', zorder=10,
                               bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='darkred', alpha=0.5))
             if not np.isnan(tp1):
                 ax_price.plot([start_date, end_date], [tp1, tp1], color='darkblue', linestyle='--', linewidth=3, alpha=0.9, zorder=2)
-                # TP1 font size = 24
+                # TP1 font size = 30
                 ax_price.text(end_date, tp1 + label_offset, f'TP1 {tp1:.4f}', color='darkblue', fontsize=24, fontweight='bold',
                               va='bottom', ha='left', zorder=10,
                               bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='darkblue', alpha=0.5))
             if not np.isnan(tp2):
                 ax_price.plot([start_date, end_date], [tp2, tp2], color='darkblue', linestyle='--', linewidth=3, alpha=0.7, zorder=2)
-                # TP2 font size = 24
+                # TP2 font size = 30
                 ax_price.text(end_date, tp2 + label_offset, f'TP2 {tp2:.4f}', color='darkblue', fontsize=24, fontweight='bold',
                               va='bottom', ha='left', zorder=10,
                               bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='darkblue', alpha=0.5))
             if not np.isnan(tp3):
                 ax_price.plot([start_date, end_date], [tp3, tp3], color='darkblue', linestyle='--', linewidth=3, alpha=0.7, zorder=2)
-                # TP3 font size = 24
+                # TP3 font size = 30
                 ax_price.text(end_date, tp3 + label_offset, f'TP3 {tp3:.4f}', color='darkblue', fontsize=24, fontweight='bold',
                               va='bottom', ha='left', zorder=10,
                               bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='darkblue', alpha=0.5))
