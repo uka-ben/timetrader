@@ -8,7 +8,7 @@ from scipy.signal import argrelextrema
 import warnings
 warnings.filterwarnings('ignore')
 
-# ---------- Technical Indicators (copied from original) ----------
+# ---------- Technical Indicators ----------
 def compute_macd(data, short=12, long=26, signal=9):
     macd_line = data['Close'].ewm(span=short, adjust=False).mean() - data['Close'].ewm(span=long, adjust=False).mean()
     signal_line = macd_line.ewm(span=signal, adjust=False).mean()
@@ -252,12 +252,10 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
         st.warning("No data to plot.")
         return None
 
-    # Much larger figure: width 22, height per subplot 18
-    fig, axes = plt.subplots(n, 1, figsize=(18, 26 * n), sharex=False)
+    fig, axes = plt.subplots(n, 1, figsize=(14, 26 * n), sharex=False)
     if n == 1:
         axes = [axes]
 
-    # Global font sizes - very large and bold
     plt.rcParams.update({
         'font.size': 24,
         'axes.labelsize': 20,
@@ -303,7 +301,6 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
         ax_div.set_ylim(-max_score * 1.2, max_score * 1.2)
 
         ax_price = ax_div.twinx()
-        # Thicker price line
         ax_price.plot(df.index, df['Close'], 'k-', label='Close', linewidth=3, alpha=0.9, zorder=1)
         ax_price.set_ylabel('Price', fontweight='bold', fontsize=18, color='blue')
         ax_price.tick_params(axis='y', labelsize=18, colors='black', labelcolor='black')
@@ -312,16 +309,15 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
             tick.set_color('black')
 
         current_price = df['Close'].iloc[-1]
-        # Thicker current price lines
         ax_price.axhline(y=current_price, color='black', linestyle='-', linewidth=5, alpha=0.8, zorder=2)
         ax_price.axhline(y=current_price, color='red', linestyle='--', linewidth=4, alpha=1.0, label='Current Price', zorder=3)
-        # Bigger current price text (fontsize doubled: 20 -> 40)
-        ax_price.text(1.02, current_price, f'{current_price:.4f}', color='red', fontsize=40, fontweight='bold',
+        # Current price font size = 25
+        ax_price.text(1.02, current_price, f'{current_price:.4f}', color='red', fontsize=25, fontweight='bold',
                       va='center', ha='left', transform=ax_price.get_yaxis_transform(), zorder=10,
                       bbox=dict(boxstyle='round,pad=0.3', facecolor='white', edgecolor='black', alpha=0.9))
 
         price_range = df['Close'].max() - df['Close'].min()
-        label_offset = price_range * 0.01  # more offset to avoid overlap
+        label_offset = price_range * 0.01
 
         signals = df[df['Confirmed_Divergence'] != 0]
         for idx in signals.index:
@@ -335,7 +331,7 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
 
             marker = '^' if sig == 1 else 'v'
             color = 'green' if sig == 1 else 'red'
-            # Larger markers (s tripled: 250 -> 750)
+            # Marker size tripled (250 -> 750)
             ax_price.scatter(idx, entry, color=color, marker=marker, s=750, zorder=15,
                              alpha=0.8,
                              label='Bullish' if (sig == 1 and row == 0) else 'Bearish' if (sig == -1 and row == 0) else "",
@@ -346,29 +342,28 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
             start_date = df.index[start_pos]
             end_date = df.index[end_pos]
 
-            # Thicker SL/TP lines
             if not np.isnan(sl):
                 ax_price.plot([start_date, end_date], [sl, sl], color='darkred', linestyle='--', linewidth=3, alpha=0.9, zorder=2)
-                # SL text fontsize doubled: 16 -> 32
-                ax_price.text(end_date, sl + label_offset, f'SL {sl:.4f}', color='darkred', fontsize=32, fontweight='bold',
+                # SL font size = 24
+                ax_price.text(end_date, sl + label_offset, f'SL {sl:.4f}', color='darkred', fontsize=24, fontweight='bold',
                               va='bottom', ha='left', zorder=10,
                               bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='darkred', alpha=0.5))
             if not np.isnan(tp1):
                 ax_price.plot([start_date, end_date], [tp1, tp1], color='darkblue', linestyle='--', linewidth=3, alpha=0.9, zorder=2)
-                # TP1 text fontsize doubled: 16 -> 32
-                ax_price.text(end_date, tp1 + label_offset, f'TP1 {tp1:.4f}', color='darkblue', fontsize=32, fontweight='bold',
+                # TP1 font size = 24
+                ax_price.text(end_date, tp1 + label_offset, f'TP1 {tp1:.4f}', color='darkblue', fontsize=24, fontweight='bold',
                               va='bottom', ha='left', zorder=10,
                               bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='darkblue', alpha=0.5))
             if not np.isnan(tp2):
                 ax_price.plot([start_date, end_date], [tp2, tp2], color='darkblue', linestyle='--', linewidth=3, alpha=0.7, zorder=2)
-                # TP2 text fontsize doubled: 16 -> 32
-                ax_price.text(end_date, tp2 + label_offset, f'TP2 {tp2:.4f}', color='darkblue', fontsize=32, fontweight='bold',
+                # TP2 font size = 24
+                ax_price.text(end_date, tp2 + label_offset, f'TP2 {tp2:.4f}', color='darkblue', fontsize=24, fontweight='bold',
                               va='bottom', ha='left', zorder=10,
                               bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='darkblue', alpha=0.5))
             if not np.isnan(tp3):
                 ax_price.plot([start_date, end_date], [tp3, tp3], color='darkblue', linestyle='--', linewidth=3, alpha=0.7, zorder=2)
-                # TP3 text fontsize doubled: 16 -> 32
-                ax_price.text(end_date, tp3 + label_offset, f'TP3 {tp3:.4f}', color='darkblue', fontsize=32, fontweight='bold',
+                # TP3 font size = 24
+                ax_price.text(end_date, tp3 + label_offset, f'TP3 {tp3:.4f}', color='darkblue', fontsize=24, fontweight='bold',
                               va='bottom', ha='left', zorder=10,
                               bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='darkblue', alpha=0.5))
 
@@ -392,7 +387,6 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
 # ---------- Streamlit App ----------
 def main():
     st.set_page_config(page_title="Trading Strategy v5d", layout="wide")
-    # Smaller page title
     st.markdown("<h2 style='text-align: left;'>📈 Swing 3 Strategy – Bias-Adaptive ATR</h2>", unsafe_allow_html=True)
 
     st.sidebar.header("Parameters")
@@ -411,16 +405,13 @@ def main():
     )
     sl_tp_display_window = st.sidebar.number_input("SL/TP display window (bars around signal)", value=20, min_value=5, step=5)
 
-    # Button to manually refresh
     run_button = st.sidebar.button("Run Analysis")
 
-    # Initialize session state for results
     if "results" not in st.session_state:
         st.session_state.results = None
     if "auto_run_done" not in st.session_state:
         st.session_state.auto_run_done = False
 
-    # Auto-run on first load or when button is pressed
     if run_button or (not st.session_state.auto_run_done):
         if not api_key:
             st.error("Please provide your Twelve Data API key.")
@@ -448,11 +439,9 @@ def main():
         status_text.text("Plotting...")
         st.session_state.results = results
         st.session_state.auto_run_done = True
-        # Clear progress after completion
         progress_bar.empty()
         status_text.empty()
 
-    # Display results if available
     if st.session_state.results is not None:
         fig = plot_multi_timeframe(st.session_state.results, symbol, sl_tp_display_window=sl_tp_display_window)
         if fig is not None:
@@ -460,7 +449,6 @@ def main():
         else:
             st.warning("No data to display.")
 
-        # Show signal summary
         st.subheader("Signal Summary")
         all_signals = []
         for interval, df in st.session_state.results.items():
