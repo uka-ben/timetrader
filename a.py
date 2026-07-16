@@ -252,7 +252,7 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
         st.warning("No data to plot.")
         return None
 
-    fig, axes = plt.subplots(n, 1, figsize=(28, 24 * n), sharex=False)
+    fig, axes = plt.subplots(n, 1, figsize=(28, 28 * n), sharex=False)
     if n == 1:
         axes = [axes]
 
@@ -260,22 +260,22 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
         'font.size': 36,
         'axes.labelsize': 20,
         'axes.titlesize': 24,
-        'xtick.labelsize': 24,
-        'ytick.labelsize': 24,
+        'xtick.labelsize': 30,
+        'ytick.labelsize': 30,
         'legend.fontsize': 24,
         'legend.title_fontsize': 24,
-        'figure.titlesize': 24
+        'figure.titlesize': 30
     })
 
     for row, interval in enumerate(intervals):
         df = results_dict[interval]
         if df.empty:
             axes[row].text(0.5, 0.5, f"No data for {interval}", ha='center', va='center', fontsize=20, weight='bold')
-            axes[row].set_title(f'{symbol}/USD  {interval}', fontsize=24, weight='bold')
+            axes[row].set_title(f'{symbol}/USD  {interval}', fontsize=30, weight='bold')
             continue
 
         ax_div = axes[row]
-        ax_div.set_xlabel('Date', fontweight='bold', fontsize=20, color='black')
+        ax_div.set_xlabel('Date', fontweight='bold', fontsize=30, color='black')
         ax_div.set_ylabel('Divergence Score (inverted: bullish ↓, bearish ↑)', fontweight='bold', fontsize=18, color='black')
 
         inverted_score = -df['Divergence_Score']
@@ -284,8 +284,8 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
         ax_div.bar(df.index, inverted_score, color=colors, width=bar_width, alpha=0.85, zorder=0)
 
         ax_div.axhline(0, color='black', linewidth=1, alpha=0.4)
-        ax_div.axhline(-3, color='green', linestyle='--', alpha=0.6, linewidth=2, label='Strong Bull')
-        ax_div.axhline(3, color='red', linestyle='--', alpha=0.6, linewidth=2, label='Strong Bear')
+        ax_div.axhline(-3, color='green', linestyle='--', alpha=0.6, linewidth=3, label='Strong Bull')
+        ax_div.axhline(3, color='red', linestyle='--', alpha=0.6, linewidth=3, label='Strong Bear')
         ax_div.tick_params(axis='y', labelsize=18, colors='black', labelcolor='black')
         ax_div.tick_params(axis='x', labelsize=18, colors='black', labelcolor='black')
         ax_div.grid(True, alpha=0.2, axis='x')
@@ -312,7 +312,7 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
         ax_price.axhline(y=current_price, color='black', linestyle='-', linewidth=5, alpha=0.8, zorder=2)
         ax_price.axhline(y=current_price, color='red', linestyle='--', linewidth=4, alpha=1.0, label='Current Price', zorder=3)
         # Current price font size = 25
-        ax_price.text(1.02, current_price, f'{current_price:.4f}', color='red', fontsize=22, fontweight='bold',
+        ax_price.text(1.02, current_price, f'{current_price:.4f}', color='red', fontsize=28, fontweight='bold',
                       va='center', ha='left', transform=ax_price.get_yaxis_transform(), zorder=10,
                       bbox=dict(boxstyle='round,pad=0.3', facecolor='white', edgecolor='black', alpha=0.9))
 
@@ -332,7 +332,7 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
             marker = '^' if sig == 1 else 'v'
             color = 'green' if sig == 1 else 'red'
             # Marker size tripled (250 -> 750)
-            ax_price.scatter(idx, entry, color=color, marker=marker, s=750, zorder=15,
+            ax_price.scatter(idx, entry, color=color, marker=marker, s=850, zorder=15,
                              alpha=0.8,
                              label='Bullish' if (sig == 1 and row == 0) else 'Bearish' if (sig == -1 and row == 0) else "",
                              edgecolors='black', linewidth=1.5)
@@ -344,26 +344,26 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
 
             if not np.isnan(sl):
                 ax_price.plot([start_date, end_date], [sl, sl], color='darkred', linestyle='--', linewidth=3, alpha=0.9, zorder=2)
-                # SL font size = 24
-                ax_price.text(end_date, sl + label_offset, f'SL {sl:.4f}', color='darkred', fontsize=24, fontweight='bold',
+                # SL font size = 30
+                ax_price.text(end_date, sl + label_offset, f'SL {sl:.4f}', color='darkred', fontsize=30, fontweight='bold',
                               va='bottom', ha='left', zorder=10,
                               bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='darkred', alpha=0.5))
             if not np.isnan(tp1):
                 ax_price.plot([start_date, end_date], [tp1, tp1], color='darkblue', linestyle='--', linewidth=3, alpha=0.9, zorder=2)
-                # TP1 font size = 24
-                ax_price.text(end_date, tp1 + label_offset, f'TP1 {tp1:.4f}', color='darkblue', fontsize=24, fontweight='bold',
+                # TP1 font size = 30
+                ax_price.text(end_date, tp1 + label_offset, f'TP1 {tp1:.4f}', color='darkblue', fontsize=30, fontweight='bold',
                               va='bottom', ha='left', zorder=10,
                               bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='darkblue', alpha=0.5))
             if not np.isnan(tp2):
                 ax_price.plot([start_date, end_date], [tp2, tp2], color='darkblue', linestyle='--', linewidth=3, alpha=0.7, zorder=2)
                 # TP2 font size = 24
-                ax_price.text(end_date, tp2 + label_offset, f'TP2 {tp2:.4f}', color='darkblue', fontsize=24, fontweight='bold',
+                ax_price.text(end_date, tp2 + label_offset, f'TP2 {tp2:.4f}', color='darkblue', fontsize=30, fontweight='bold',
                               va='bottom', ha='left', zorder=10,
                               bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='darkblue', alpha=0.5))
             if not np.isnan(tp3):
                 ax_price.plot([start_date, end_date], [tp3, tp3], color='darkblue', linestyle='--', linewidth=3, alpha=0.7, zorder=2)
                 # TP3 font size = 24
-                ax_price.text(end_date, tp3 + label_offset, f'TP3 {tp3:.4f}', color='darkblue', fontsize=24, fontweight='bold',
+                ax_price.text(end_date, tp3 + label_offset, f'TP3 {tp3:.4f}', color='darkblue', fontsize=30, fontweight='bold',
                               va='bottom', ha='left', zorder=10,
                               bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='darkblue', alpha=0.5))
 
