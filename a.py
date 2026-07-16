@@ -257,7 +257,7 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
         axes = [axes]
 
     plt.rcParams.update({
-        'font.size': 24,
+        'font.size': 36,
         'axes.labelsize': 20,
         'axes.titlesize': 24,
         'xtick.labelsize': 24,
