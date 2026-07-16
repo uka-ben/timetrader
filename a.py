@@ -252,7 +252,7 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
         st.warning("No data to plot.")
         return None
 
-    fig, axes = plt.subplots(n, 1, figsize=(16, 24 * n), sharex=False)
+    fig, axes = plt.subplots(n, 1, figsize=(20, 24 * n), sharex=False)
     if n == 1:
         axes = [axes]
 
@@ -312,7 +312,7 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
         ax_price.axhline(y=current_price, color='black', linestyle='-', linewidth=5, alpha=0.8, zorder=2)
         ax_price.axhline(y=current_price, color='red', linestyle='--', linewidth=4, alpha=1.0, label='Current Price', zorder=3)
         # Current price font size = 25
-        ax_price.text(1.02, current_price, f'{current_price:.4f}', color='red', fontsize=25, fontweight='bold',
+        ax_price.text(1.02, current_price, f'{current_price:.4f}', color='red', fontsize=22, fontweight='bold',
                       va='center', ha='left', transform=ax_price.get_yaxis_transform(), zorder=10,
                       bbox=dict(boxstyle='round,pad=0.3', facecolor='white', edgecolor='black', alpha=0.9))
 
