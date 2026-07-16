@@ -252,7 +252,7 @@ def plot_multi_timeframe(results_dict, symbol, sl_tp_display_window=20):
         st.warning("No data to plot.")
         return None
 
-    fig, axes = plt.subplots(n, 1, figsize=(28, 28 * n), sharex=False)
+    fig, axes = plt.subplots(n, 1, figsize=(28, 40 * n), sharex=False)
     if n == 1:
         axes = [axes]
 
